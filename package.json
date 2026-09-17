@@ -1,0 +1,23 @@
+{
+  "name": "campusflow-ai-root",
+  "version": "1.0.0",
+  "description": "CampusFlow AI - Smart Campus Management Platform",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "keywords": [
+    "campus-management",
+    "react",
+    "node",
+    "express",
+    "supabase",
+    "gemini-ai"
+  ],
+  "author": "CampusFlow AI Team",
+  "license": "MIT"
+}
