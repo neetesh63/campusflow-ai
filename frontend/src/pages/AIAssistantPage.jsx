@@ -57,10 +57,26 @@ export default function AIAssistantPage() {
         };
         setMessages(prev => [...prev, botMsg]);
       } else {
-        toast.error('AI Service encountered an issue');
+        const errMsg = res.message || 'AI Service encountered an issue';
+        toast.error(errMsg);
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          sender: 'bot',
+          text: `⚠️ AI Assistant Notice: ${errMsg}. Please check system connectivity or try again shortly.`,
+          source: 'system-error',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]);
       }
     } catch (err) {
-      toast.error('Failed to communicate with AI Assistant');
+      const errorDetail = err.message || err.data?.message || 'Failed to communicate with backend server';
+      toast.error(errorDetail);
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        sender: 'bot',
+        text: `⚠️ Connection Notice: ${errorDetail}. Ensure your backend server is online and VITE_API_BASE_URL is configured.`,
+        source: 'system-error',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
     } finally {
       setLoading(false);
     }

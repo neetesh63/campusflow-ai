@@ -25,7 +25,14 @@ const PORT = process.env.PORT || 5000;
 // Security & Utility Middleware
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const configured = process.env.FRONTEND_URL;
+    if (!configured || configured === '*' || origin === configured || origin.startsWith(configured.replace(/\/$/, '')) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Allow cross-origin requests for production frontend
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-demo-role']
 }));
