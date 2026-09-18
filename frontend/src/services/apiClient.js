@@ -18,11 +18,13 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    const demoUser = localStorage.getItem('campusflow_user');
-    if (demoUser) {
+    const savedUser = localStorage.getItem('campusflow_user');
+    if (savedUser) {
       try {
-        const userObj = JSON.parse(demoUser);
-        config.headers['x-demo-role'] = userObj.role || 'student';
+        const userObj = JSON.parse(savedUser);
+        if (userObj.is_demo) {
+          config.headers['x-demo-role'] = userObj.role || 'student';
+        }
       } catch (e) {}
     }
     return config;

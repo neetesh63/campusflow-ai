@@ -17,25 +17,74 @@ let MOCK_COURSE_SUMMARY = [
   { course_code: 'CSE-303', course_name: 'Computer Networks', total_classes: 28, attended: 20, percentage: 71.42, status: 'warning' },
   { course_code: 'CSE-304', course_name: 'Design & Analysis of Algorithms', total_classes: 35, attended: 32, percentage: 91.42, status: 'good' },
   { course_code: 'CSE-305', course_name: 'Software Engineering', total_classes: 25, attended: 21, percentage: 84.00, status: 'good' },
-];
+const { supabase } = require('../config/supabase');
 
 async function getAttendanceRecords(req, res) {
   try {
-    const studentId = req.query.student_id || req.user.id;
-    const overallAttended = MOCK_COURSE_SUMMARY.reduce((acc, curr) => acc + curr.attended, 0);
-    const overallTotal = MOCK_COURSE_SUMMARY.reduce((acc, curr) => acc + curr.total_classes, 0);
-    const overallPercentage = ((overallAttended / overallTotal) * 100).toFixed(1);
+    const studentId = req.query.student_id || req.user?.id;
+    const isDemo = Boolean(req.user?.is_demo);
+
+    // If Demo user, return presentation mock attendance
+    if (isDemo) {
+      const overallAttended = MOCK_COURSE_SUMMARY.reduce((acc, curr) => acc + curr.attended, 0);
+      const overallTotal = MOCK_COURSE_SUMMARY.reduce((acc, curr) => acc + curr.total_classes, 0);
+      const overallPercentage = ((overallAttended / overallTotal) * 100).toFixed(1);
+
+      return res.json({
+        success: true,
+        message: 'Attendance records retrieved (Demo Mode)',
+        data: {
+          overallPercentage: parseFloat(overallPercentage),
+          overallAttended,
+          overallTotal,
+          lowAttendanceWarning: overallPercentage < 75,
+          courseSummary: MOCK_COURSE_SUMMARY,
+          recentLogs: MOCK_ATTENDANCE
+        }
+      });
+    }
+
+    // For Real user, fetch actual attendance records from Supabase
+    let courseSummary = [];
+    let recentLogs = [];
+    let overallAttended = 0;
+    let overallTotal = 0;
+    let overallPercentage = 0;
+
+    if (supabase && studentId) {
+      const { data: attLogs, error } = await supabase
+        .from('attendance')
+        .select('*, courses(name, code)')
+        .eq('student_id', studentId)
+        .order('date', { ascending: false });
+
+      if (!error && attLogs && attLogs.length > 0) {
+        recentLogs = attLogs.map(a => ({
+          id: a.id,
+          student_id: a.student_id,
+          course_code: a.courses?.code || 'Course',
+          course_name: a.courses?.name || 'Course Name',
+          date: a.date,
+          status: a.status,
+          marked_by: a.marked_by || 'Faculty'
+        }));
+
+        overallTotal = recentLogs.length;
+        overallAttended = recentLogs.filter(l => l.status === 'present').length;
+        overallPercentage = parseFloat(((overallAttended / overallTotal) * 100).toFixed(1));
+      }
+    }
 
     return res.json({
       success: true,
       message: 'Attendance records retrieved',
       data: {
-        overallPercentage: parseFloat(overallPercentage),
+        overallPercentage,
         overallAttended,
         overallTotal,
-        lowAttendanceWarning: overallPercentage < 75,
-        courseSummary: MOCK_COURSE_SUMMARY,
-        recentLogs: MOCK_ATTENDANCE
+        lowAttendanceWarning: overallTotal > 0 && overallPercentage < 75,
+        courseSummary,
+        recentLogs
       }
     });
   } catch (error) {

@@ -11,7 +11,8 @@ const DEMO_PROFILES = {
     full_name: 'Alex Johnson',
     department: 'Computer Science & Engineering',
     semester: 6,
-    enrollment_number: 'CS2026-089'
+    enrollment_number: 'CS2026-089',
+    is_demo: true
   },
   faculty: {
     id: 'faculty-id-202',
@@ -19,7 +20,8 @@ const DEMO_PROFILES = {
     role: 'faculty',
     full_name: 'Prof. Alan Turing',
     department: 'Computer Science & Engineering',
-    enrollment_number: 'FAC-2026-012'
+    enrollment_number: 'FAC-2026-012',
+    is_demo: true
   },
   admin: {
     id: 'admin-id-101',
@@ -27,7 +29,8 @@ const DEMO_PROFILES = {
     role: 'admin',
     full_name: 'Dr. Sarah Connor',
     department: 'Administration',
-    enrollment_number: 'ADM-2026-001'
+    enrollment_number: 'ADM-2026-001',
+    is_demo: true
   }
 };
 
@@ -53,7 +56,7 @@ async function authenticateUser(req, res, next) {
     // 1. If Authorization header is missing or non-Bearer
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       const demoKey = headerDemoRole || 'student';
-      req.user = DEMO_PROFILES[demoKey] || DEMO_PROFILES.student;
+      req.user = { ...(DEMO_PROFILES[demoKey] || DEMO_PROFILES.student), is_demo: true };
       return next();
     }
 
@@ -65,7 +68,7 @@ async function authenticateUser(req, res, next) {
       if (token.includes('faculty') || headerDemoRole === 'faculty') matchedRole = 'faculty';
       else if (token.includes('admin') || headerDemoRole === 'admin') matchedRole = 'admin';
 
-      req.user = DEMO_PROFILES[matchedRole] || DEMO_PROFILES.student;
+      req.user = { ...(DEMO_PROFILES[matchedRole] || DEMO_PROFILES.student), is_demo: true };
       return next();
     }
 
@@ -75,7 +78,8 @@ async function authenticateUser(req, res, next) {
       if (decoded && decoded.role) {
         req.user = {
           ...decoded,
-          role: normalizeRole(decoded.role)
+          role: normalizeRole(decoded.role),
+          is_demo: false
         };
         return next();
       }
@@ -109,7 +113,8 @@ async function authenticateUser(req, res, next) {
           email: user.email,
           role: userRole,
           full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-          department: user.user_metadata?.department || 'Computer Science'
+          department: user.user_metadata?.department || 'Computer Science',
+          is_demo: false
         };
         return next();
       }
@@ -117,7 +122,7 @@ async function authenticateUser(req, res, next) {
 
     // 5. If token was provided but failed verification in all providers, check demo role fallback
     if (headerDemoRole && DEMO_PROFILES[headerDemoRole]) {
-      req.user = DEMO_PROFILES[headerDemoRole];
+      req.user = { ...DEMO_PROFILES[headerDemoRole], is_demo: true };
       return next();
     }
 

@@ -65,7 +65,8 @@ export const AuthProvider = ({ children }) => {
       full_name: sbUser.user_metadata?.full_name || sbUser.email?.split('@')[0] || 'Campus User',
       role: sbUser.user_metadata?.role || 'student',
       department: sbUser.user_metadata?.department || 'Computer Science',
-      avatar_url: sbUser.user_metadata?.avatar_url
+      avatar_url: sbUser.user_metadata?.avatar_url,
+      is_demo: false
     };
 
     // Try fetching detailed profile from Supabase profiles table
@@ -84,7 +85,8 @@ export const AuthProvider = ({ children }) => {
           department: profile.department || userProfile.department,
           semester: profile.semester,
           enrollment_number: profile.enrollment_number,
-          avatar_url: profile.avatar_url || userProfile.avatar_url
+          avatar_url: profile.avatar_url || userProfile.avatar_url,
+          is_demo: false
         };
       }
     } catch (e) {
@@ -197,7 +199,8 @@ export const AuthProvider = ({ children }) => {
         department: 'Computer Science & Engineering',
         semester: 6,
         enrollment_number: 'CS2026-089',
-        avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+        avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+        is_demo: true
       },
       faculty: {
         id: 'faculty-id-202',
@@ -206,7 +209,8 @@ export const AuthProvider = ({ children }) => {
         role: 'faculty',
         department: 'Computer Science & Engineering',
         enrollment_number: 'FAC-2026-012',
-        avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'
+        avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+        is_demo: true
       },
       admin: {
         id: 'admin-id-101',
@@ -215,7 +219,8 @@ export const AuthProvider = ({ children }) => {
         role: 'admin',
         department: 'Administration',
         enrollment_number: 'ADM-2026-001',
-        avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150'
+        avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
+        is_demo: true
       }
     };
 

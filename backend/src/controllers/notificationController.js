@@ -51,9 +51,9 @@ let MOCK_NOTIFICATIONS = [
 async function getNotifications(req, res) {
   try {
     const userId = req.user?.id;
-    const isDemoUser = !userId || userId.startsWith('student-id-') || userId.startsWith('faculty-id-') || userId.startsWith('admin-id-');
+    const isDemoUser = Boolean(req.user?.is_demo);
 
-    if (supabase && !isDemoUser) {
+    if (supabase && !isDemoUser && userId) {
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -75,8 +75,10 @@ async function getNotifications(req, res) {
     }
 
     // Demo Mode or Fallback Mode
-    // Filter for current demo role/user
-    const userNotifs = MOCK_NOTIFICATIONS.filter(n => n.user_id === userId || isDemoUser);
+    const userNotifs = isDemoUser 
+      ? MOCK_NOTIFICATIONS.filter(n => n.user_id === userId || n.is_demo)
+      : MOCK_NOTIFICATIONS.filter(n => n.user_id === userId);
+
     const unreadCount = userNotifs.filter(n => !n.is_read).length;
 
     return res.json({
