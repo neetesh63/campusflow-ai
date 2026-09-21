@@ -35,14 +35,15 @@ const DEMO_PROFILES = {
 };
 
 /**
- * Helper to normalize role strings to lowercase
+ * Helper to normalize role strings to valid application roles (student, faculty, admin)
  */
 function normalizeRole(roleStr) {
   if (!roleStr) return 'student';
   const clean = String(roleStr).toLowerCase().trim();
-  if (clean === 'teacher' || clean === 'professor' || clean === 'instructor') return 'faculty';
-  if (clean === 'administrator' || clean === 'superadmin') return 'admin';
-  return clean;
+  if (clean === 'teacher' || clean === 'professor' || clean === 'instructor' || clean === 'faculty') return 'faculty';
+  if (clean === 'administrator' || clean === 'superadmin' || clean === 'admin') return 'admin';
+  if (clean === 'student' || clean === 'authenticated' || clean === 'user' || clean === 'guest') return 'student';
+  return 'student';
 }
 
 /**
@@ -145,10 +146,14 @@ async function authenticateUser(req, res, next) {
     try {
       const decoded = jwt.decode(token);
       if (decoded && (decoded.sub || decoded.email)) {
+        const roleFromMetadata = decoded.user_metadata?.role;
+        const roleFromClaim = decoded.role !== 'authenticated' ? decoded.role : null;
+        const finalRole = normalizeRole(roleFromMetadata || roleFromClaim || 'student');
+
         req.user = {
           id: decoded.sub || decoded.id || 'real-user-id',
           email: decoded.email || 'user@campusflow.edu',
-          role: normalizeRole(decoded.user_metadata?.role || decoded.role || 'student'),
+          role: finalRole,
           full_name: decoded.user_metadata?.full_name || decoded.email?.split('@')[0] || 'Campus User',
           department: decoded.user_metadata?.department || 'Computer Science',
           is_demo: false

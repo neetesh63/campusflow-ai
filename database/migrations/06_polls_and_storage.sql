@@ -66,3 +66,16 @@ FOR DELETE USING (
   bucket_id = 'assignment-attachments' 
   AND auth.uid() = owner
 );
+
+-- 5. Profiles Table RLS Policies for Real User Creation & Updates
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read profiles" ON public.profiles;
+CREATE POLICY "Allow public read profiles" ON public.profiles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users insert own profile" ON public.profiles;
+CREATE POLICY "Users insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id OR auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Users update own profile" ON public.profiles;
+CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id OR auth.role() = 'authenticated');
+
