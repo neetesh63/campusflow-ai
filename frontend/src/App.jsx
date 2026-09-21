@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Public Pages
 import LandingPage from './pages/LandingPage';
+import FeaturesPage from './pages/FeaturesPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -46,6 +47,7 @@ export default function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
+              <Route path="/features" element={<FeaturesPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<SignupPage />} />
               <Route path="/signup" element={<SignupPage />} />

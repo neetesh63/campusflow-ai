@@ -36,10 +36,12 @@ export default function AIStudyPlannerPage() {
         setPlanResult(res.data);
         toast.success('AI Study Plan generated successfully!');
       } else {
-        toast.error('Failed to generate study plan');
+        const msg = res.message || 'Failed to generate study plan';
+        toast.error(msg);
       }
     } catch (err) {
-      toast.error('Error generating AI study plan');
+      const msg = err.message || err.data?.message || 'Error generating AI study plan';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

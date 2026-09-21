@@ -152,7 +152,7 @@ export default function AIAssistantPage() {
                   </div>
                   <div className="p-3.5 rounded-2xl bg-slate-800 border border-slate-700 text-xs text-slate-400 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-cyan-400 animate-spin" />
-                    <span>CampusFlow AI is generating response...</span>
+                    <span>CampusFlow AI is generating response (Initial request may take a few seconds if backend is waking up)...</span>
                   </div>
                 </div>
               )}

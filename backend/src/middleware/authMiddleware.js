@@ -55,9 +55,14 @@ async function authenticateUser(req, res, next) {
 
     // 1. If Authorization header is missing or non-Bearer
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      const demoKey = headerDemoRole || 'student';
-      req.user = { ...(DEMO_PROFILES[demoKey] || DEMO_PROFILES.student), is_demo: true };
-      return next();
+      if (headerDemoRole && DEMO_PROFILES[headerDemoRole]) {
+        req.user = { ...DEMO_PROFILES[headerDemoRole], is_demo: true };
+        return next();
+      }
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required. Please sign in or use a demo account.'
+      });
     }
 
     const token = authHeader.split(' ')[1];

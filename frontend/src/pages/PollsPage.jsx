@@ -9,7 +9,7 @@ import EmptyState from '../components/EmptyState';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Vote, Plus, CheckCircle2, Lock, BarChart2, ShieldCheck, Clock } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/apiClient';
 
 export default function PollsPage() {
   const { user } = useAuth();
@@ -38,12 +38,14 @@ export default function PollsPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await axios.get('/api/polls');
-      if (res.data.success) {
-        setPolls(res.data.data || []);
+      const res = await api.get('/polls');
+      if (res.success) {
+        setPolls(res.data || []);
+      } else {
+        setError(res.message || 'Failed to load campus polls.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load campus polls.');
+      setError(err.message || 'Failed to load campus polls.');
     } finally {
       setLoading(false);
     }
@@ -52,13 +54,13 @@ export default function PollsPage() {
   const handleVote = async (pollId, optionIndex) => {
     try {
       setVotingId(pollId);
-      const res = await axios.post(`/api/polls/${pollId}/vote`, { option_index: optionIndex });
-      if (res.data.success) {
+      const res = await api.post(`/polls/${pollId}/vote`, { option_index: optionIndex });
+      if (res.success) {
         showToast('Your vote has been recorded!', 'success');
         fetchPolls();
       }
     } catch (err) {
-      showToast(err.response?.data?.message || 'Failed to submit vote.', 'error');
+      showToast(err.message || 'Failed to submit vote.', 'error');
     } finally {
       setVotingId(null);
     }
@@ -86,7 +88,7 @@ export default function PollsPage() {
 
     try {
       setSubmitting(true);
-      const res = await axios.post('/api/polls', {
+      const res = await api.post('/polls', {
         title,
         description,
         options: cleanOptions,
@@ -94,7 +96,7 @@ export default function PollsPage() {
         is_anonymous: isAnonymous
       });
 
-      if (res.data.success) {
+      if (res.success) {
         showToast('New campus poll published!', 'success');
         setIsModalOpen(false);
         setTitle('');

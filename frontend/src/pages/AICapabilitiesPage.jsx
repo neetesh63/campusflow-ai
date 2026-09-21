@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import TopNavbar from '../components/TopNavbar';
+import PublicNavbar from '../components/PublicNavbar';
 import {
   Sparkles,
   BrainCircuit,
@@ -16,7 +16,7 @@ export default function AICapabilitiesPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950 flex flex-col">
-      <TopNavbar />
+      <PublicNavbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
         <div className="space-y-4">

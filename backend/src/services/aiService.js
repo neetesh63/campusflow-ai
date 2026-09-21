@@ -120,7 +120,7 @@ async function testGeminiAPI() {
   const prompt = 'Explain CampusFlow AI in one sentence.';
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  const candidateModels = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-pro'];
+  const candidateModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
 
   for (const modelName of candidateModels) {
     try {
@@ -157,7 +157,7 @@ async function generateCampusAIChat(userMessage, conversationHistory = [], user 
   const genAI = getGenerativeAIInstance();
 
   if (genAI) {
-    const candidateModels = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-pro'];
+    const candidateModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
     const prompt = `You are CampusFlow AI Assistant, an intelligent, helpful, and concise AI campus assistant for ${context.userName}.
 IMPORTANT INSTRUCTIONS:
 - Answer based ONLY on verified campus context provided below when applicable.
@@ -246,7 +246,7 @@ async function generateAIStudyPlan(params) {
   const genAI = getGenerativeAIInstance();
 
   if (genAI) {
-    const candidateModels = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-pro'];
+    const candidateModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
     const prompt = `Create a structured study plan JSON for a college student with the following inputs:
 - Subjects: ${subjects}
 - Daily Available Hours: ${dailyHours} hours
@@ -266,11 +266,16 @@ Return a JSON object with:
       try {
         const model = genAI.getGenerativeModel({ model: modelName });
         const result = await model.generateContent(prompt);
-        const text = result.response.text();
+        let text = result.response.text();
+        text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          return { success: true, plan: parsed, modelUsed: modelName, source: 'gemini-api' };
+          try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            return { success: true, plan: parsed, modelUsed: modelName, source: 'gemini-api' };
+          } catch (pe) {
+            console.warn(`JSON parse error on Gemini ${modelName} output:`, pe.message);
+          }
         }
       } catch (error) {
         console.warn(`Gemini model ${modelName} Study Plan call failed:`, error.message);
@@ -322,7 +327,7 @@ async function suggestLostFoundMatches(lostItems = [], foundItems = []) {
   const genAI = getGenerativeAIInstance();
 
   if (genAI && lostItems.length > 0 && foundItems.length > 0) {
-    const candidateModels = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-pro'];
+    const candidateModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
     const prompt = `Analyze these reported Lost Items and Found Items on a college campus and suggest possible matches based on item names, category, description, location, and dates.
 
 LOST ITEMS:

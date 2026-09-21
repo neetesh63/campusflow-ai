@@ -84,28 +84,25 @@ async function loginUser(req, res) {
       }
     }
 
-    // Check Demo Users fallback
+    // Check Demo Users matching email and password
     const targetEmail = email.toLowerCase().trim();
-    let foundUser = DEMO_USERS.find(u => u.email === targetEmail);
+    const foundUser = DEMO_USERS.find(u => u.email === targetEmail && u.password === password);
 
-    // If role requested specifically and not found, match by role
-    if (!foundUser && role) {
-      foundUser = DEMO_USERS.find(u => u.role === role);
+    if (foundUser) {
+      const token = jwt.sign({ ...foundUser, is_demo: true }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({
+        success: true,
+        message: 'Login successful (Demo Mode)',
+        data: {
+          user: { ...foundUser, is_demo: true },
+          token
+        }
+      });
     }
 
-    if (!foundUser) {
-      foundUser = DEMO_USERS[0]; // Fallback to student demo user
-    }
-
-    const token = jwt.sign(foundUser, JWT_SECRET, { expiresIn: '7d' });
-
-    return res.json({
-      success: true,
-      message: 'Login successful (Demo Mode)',
-      data: {
-        user: foundUser,
-        token
-      }
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid email or password'
     });
 
   } catch (error) {

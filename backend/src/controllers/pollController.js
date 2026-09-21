@@ -36,10 +36,30 @@ async function getPolls(req, res) {
     const studentId = req.user.id;
 
     if (supabase) {
-      const { data: polls, error } = await supabase
+      let polls = null;
+      let error = null;
+
+      // Try joint query first
+      const res1 = await supabase
         .from('polls')
         .select('*, poll_votes(*)')
         .order('created_at', { ascending: false });
+
+      polls = res1.data;
+      error = res1.error;
+
+      // If joint query fails due to missing FK relation, query tables separately
+      if (error) {
+        const { data: pData, error: pErr } = await supabase.from('polls').select('*').order('created_at', { ascending: false });
+        const { data: vData } = await supabase.from('poll_votes').select('*');
+        if (!pErr && pData) {
+          polls = pData.map(p => ({
+            ...p,
+            poll_votes: (vData || []).filter(v => v.poll_id === p.id)
+          }));
+          error = null;
+        }
+      }
 
       if (!error && polls) {
         const formatted = polls.map(poll => {
@@ -54,7 +74,7 @@ async function getPolls(req, res) {
             id: poll.id,
             title: poll.title,
             description: poll.description,
-            options: poll.options,
+            options: poll.options || [],
             start_date: poll.start_date,
             end_date: poll.end_date,
             is_active: poll.is_active,

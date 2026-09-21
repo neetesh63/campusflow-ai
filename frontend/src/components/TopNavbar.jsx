@@ -98,8 +98,15 @@ export default function Navbar() {
                   <div className="px-4 py-2 border-b border-slate-800">
                     <p className="text-xs font-bold text-slate-200">{user.full_name}</p>
                     <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
-                    <div className="mt-1.5 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 font-semibold border border-cyan-500/20 capitalize">
-                      <ShieldCheck className="w-3 h-3" /> {user.role} Role
+                    <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                      <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 font-semibold border border-cyan-500/20 capitalize">
+                        <ShieldCheck className="w-3 h-3" /> {user.role} Role
+                      </span>
+                      {user.is_demo && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">
+                          Demo Mode
+                        </span>
+                      )}
                     </div>
                   </div>
 

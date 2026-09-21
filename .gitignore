@@ -20,6 +20,8 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# IDE Files
+# IDE & Reference Files
 .vscode/
 .idea/
+GOOGLE SKILL/
+

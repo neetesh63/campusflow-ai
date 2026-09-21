@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TopNavbar from '../components/TopNavbar';
+import PublicNavbar from '../components/PublicNavbar';
 import { useToast } from '../context/ToastContext';
 import { Mail, Phone, MapPin, Send, MessageSquare } from 'lucide-react';
 import FormField from '../components/FormField';
@@ -20,7 +20,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950 flex flex-col">
-      <TopNavbar />
+      <PublicNavbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">

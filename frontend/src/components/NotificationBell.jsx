@@ -14,8 +14,10 @@ import {
   ExternalLink
 } from 'lucide-react';
 import api from '../services/apiClient';
+import { useAuth } from '../context/AuthContext';
 
 export default function NotificationDropdown() {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -27,6 +29,7 @@ export default function NotificationDropdown() {
 
   // Fetch notifications from API
   const fetchNotifications = async () => {
+    if (!user) return;
     try {
       setLoading(true);
       setError(null);
